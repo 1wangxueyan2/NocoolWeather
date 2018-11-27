@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="nocool_weather"/>
+    <version value="1"/>
+    <list>
+        <mapping class="com.deer404.nocoolweather.db.Province"/>
+        <mapping class="com.deer404.nocoolweather.db.City"/>
+        <mapping class="com.deer404.nocoolweather.db.County"/>
+    </list>
+</litepal>
