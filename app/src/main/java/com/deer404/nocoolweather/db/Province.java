@@ -1,8 +1,11 @@
 package com.deer404.nocoolweather.db;
 
-import org.litepal.crud.LitePalSupport;
 
-public class Province extends LitePalSupport {
+
+import org.litepal.crud.DataSupport;
+
+
+public class Province extends DataSupport {
     private int id;
     private String provinceName; //记录省的名字
     private int provinceCode; //记录省的代号

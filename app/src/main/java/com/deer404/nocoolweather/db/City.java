@@ -1,8 +1,9 @@
 package com.deer404.nocoolweather.db;
 
-import org.litepal.crud.LitePalSupport;
+import org.litepal.crud.DataSupport;
 
-public class City extends LitePalSupport {
+
+public class City extends DataSupport {
     private int id;
     private String cityName;//记录市的名字
     private int cityCode; //记录市的代号
