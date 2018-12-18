@@ -1,6 +1,7 @@
 package com.deer404.nocoolweather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.deer404.nocoolweather.db.City;
 import com.deer404.nocoolweather.db.County;
 import com.deer404.nocoolweather.db.Province;
+import com.deer404.nocoolweather.gson.Weather;
 import com.deer404.nocoolweather.util.HttpUtil;
 import com.deer404.nocoolweather.util.Utility;
 
@@ -48,7 +50,7 @@ public class ChooseAreaFragment extends Fragment {
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private List<String> dataList = new ArrayList<>();
-    private List<Province> provinceList;
+    private List<Province> provinceList; //存储的是个对象
     private List<City> cityList;
     private List<County> countyList;
     private Province selectedProvince;
@@ -73,11 +75,17 @@ public class ChooseAreaFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(currentLevel == LEVEL_PROVINCE){
-                    selectedProvince = provinceList.get(position);
+                    selectedProvince = provinceList.get(position); //把集合里 对应下标的数据存储到对象里
                     queryCities();
                 }else if (currentLevel == LEVEL_CITY){
                     selectedCity = cityList.get(position);
                     queryCounties();
+                }else if (currentLevel == LEVEL_COUNTY){
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -99,7 +107,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryProvinces(){
         titleText.setText("中国"); //设置标题
         backButton.setVisibility(View.GONE); //隐藏返回键
-        provinceList = DataSupport.findAll(Province.class);
+        provinceList = DataSupport.findAll(Province.class); //把数据库的数据存储到list集合
         if (provinceList.size()>0){ //如果数据库有数据
             dataList.clear(); //清空数据集
             for (Province province : provinceList){ //遍历
@@ -158,13 +166,13 @@ public class ChooseAreaFragment extends Fragment {
         }
     }
 
-    private void queryFromServer(String address,final String type){
-        showProgressDialog();
-        HttpUtil.sendOkHttpRequest(address, new Callback() {
+    private void queryFromServer(String address,final String type){ //服务器查询
+        showProgressDialog(); //弹出窗口
+        HttpUtil.sendOkHttpRequest(address, new Callback() {  //向服务器发送请求
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseText =response.body().string();
-                boolean result = false;
+            public void onResponse(Call call, Response response) throws IOException { //响应的数据会回调到这
+                String responseText =response.body().string(); //存储获得的数据
+                boolean result = false; //判断是否获得了数据，下面几个if判断，如果成功就会返回true并把数据存储到数据库
                 if("province".equals(type)){
                     result = Utility.handleProvinceResponse(responseText);
                 }else if ("city".equals(type)){
@@ -172,8 +180,8 @@ public class ChooseAreaFragment extends Fragment {
                 }else if ("county".equals(type)){
                     result = Utility.handleCountyResponse(responseText,selectedCity.getId());
                 }
-                if (result){
-                    getActivity().runOnUiThread(new Runnable() {
+                if (result){ //如果从服务器查询到了数据
+                    getActivity().runOnUiThread(new Runnable() { //回到主线程
                         @Override
                         public void run() {
                             closeProgressDialog();

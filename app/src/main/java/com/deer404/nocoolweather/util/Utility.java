@@ -1,12 +1,26 @@
 package com.deer404.nocoolweather.util;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.deer404.nocoolweather.WeatherActivity;
 import com.deer404.nocoolweather.db.City;
 import com.deer404.nocoolweather.db.County;
 import com.deer404.nocoolweather.db.Province;
+import com.deer404.nocoolweather.gson.Weather;
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class Utility {
     /**
@@ -74,4 +88,20 @@ public class Utility {
         }
         return false;
     }
+    /**
+     * 将返回的JSON数据解析成Weather实体类
+     */
+    public static Weather handleWeatherResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            Log.d("Deer404","JsonArray:"+weatherContent);
+            return new Gson().fromJson(weatherContent, Weather.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
