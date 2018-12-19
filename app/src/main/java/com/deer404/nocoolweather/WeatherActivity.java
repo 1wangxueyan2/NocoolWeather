@@ -1,5 +1,6 @@
 package com.deer404.nocoolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.deer404.nocoolweather.gson.Forecast;
 import com.deer404.nocoolweather.gson.Weather;
+import com.deer404.nocoolweather.service.AutoUpdateService;
 import com.deer404.nocoolweather.util.HttpUtil;
 import com.deer404.nocoolweather.util.Utility;
 
@@ -123,7 +125,6 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                Log.d("Deer404", responseText);
                 final Weather weather = Utility.handleWeatherResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -189,6 +190,8 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this,AutoUpdateService.class);
+        startService(intent);
     }
 
     private void loadBingPic() {
