@@ -5,10 +5,14 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -56,6 +60,14 @@ public class WeatherActivity extends AppCompatActivity {
     TextView sportText;
     @BindView(R.id.bing_pic_img)
     ImageView bingPicImg;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefresh;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.nav_button)
+    Button navButton;
+    private String mWeatherId; //城市id 例如：CN101010100
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,24 +76,45 @@ public class WeatherActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
         if (weatherString != null) {
+            //有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
+            mWeatherId = weather.basic.weatherid;
             showWeatherInfo(weather);
         } else {
-            String weatherId = getIntent().getStringExtra("weather_id");
+            //无缓存时去服务器查询天气
+            mWeatherId= getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(weatherId);
+            requestWeather(mWeatherId);
         }
+        //下拉刷新天气数据
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(mWeatherId);
+            }
+        });
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        //背景图片
         String bingPic = prefs.getString("bing_pic",null);
         if (bingPic!=null){
             Glide.with(this).load(bingPic).into(bingPicImg);
         }else {
             loadBingPic();
         }
+        //状态栏透明
         if (Build.VERSION.SDK_INT >= 21){
             View decorView = getWindow().getDecorView();
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
+        //滑动菜单
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
     }
 
     public void requestWeather(final String weatherId) {
@@ -92,7 +125,6 @@ public class WeatherActivity extends AppCompatActivity {
                 final String responseText = response.body().string();
                 Log.d("Deer404", responseText);
                 final Weather weather = Utility.handleWeatherResponse(responseText);
-                Log.d("Deer404", weather.status);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -104,6 +136,7 @@ public class WeatherActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -114,6 +147,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
