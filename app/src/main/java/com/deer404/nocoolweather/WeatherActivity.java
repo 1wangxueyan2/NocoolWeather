@@ -25,6 +25,7 @@ import com.deer404.nocoolweather.gson.Forecast;
 import com.deer404.nocoolweather.gson.Weather;
 import com.deer404.nocoolweather.service.AutoUpdateService;
 import com.deer404.nocoolweather.util.HttpUtil;
+import com.deer404.nocoolweather.util.Time;
 import com.deer404.nocoolweather.util.Utility;
 
 import java.io.IOException;
@@ -171,7 +172,19 @@ public class WeatherActivity extends AppCompatActivity {
             TextView infoText = view.findViewById(R.id.info_text);
             TextView maxText = view.findViewById(R.id.max_text);
             TextView minText = view.findViewById(R.id.min_text);
-            dateText.setText(forecast.date);
+            long diff = Time.converTime(forecast.date);
+            if (diff >= 0){
+                if (diff == 0){
+                    Log.d("Deer404Time","Time"+diff);
+                    dateText.setText("今天");
+                }
+                if (diff == 1){
+                    dateText.setText("明天");
+                }
+                if(diff ==2){
+                    dateText.setText("后天");
+                }
+            }
             infoText.setText(forecast.more.info);
             maxText.setText(forecast.temperature.max);
             minText.setText(forecast.temperature.min);
