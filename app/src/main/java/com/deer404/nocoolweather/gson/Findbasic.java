@@ -5,9 +5,11 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by Deer404 on 2018/12/28
  */
-public class Basic {
+public class Findbasic {
     @SerializedName("cid")
-    public String weatherid;
+    public String locationid;
     @SerializedName("location")
-    public  String location;
+    public String location;
+    @SerializedName("cnty")
+    public String cityname;
 }

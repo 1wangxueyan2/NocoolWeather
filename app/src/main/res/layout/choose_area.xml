@@ -25,6 +25,11 @@
          android:layout_centerVertical="true"
          android:background="@drawable/back"
          />
+ <!--    <android.support.v7.widget.Toolbar
+         android:id="@+id/choose_toolbar"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         />-->
  </RelativeLayout>
     <ListView
         android:id="@+id/list_view"

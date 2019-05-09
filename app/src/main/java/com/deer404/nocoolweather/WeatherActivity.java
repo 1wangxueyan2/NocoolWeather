@@ -57,80 +57,89 @@ public class WeatherActivity extends AppCompatActivity {
     TextView qltyText;
     @BindView(R.id.comfort_text)
     TextView comfortText;
+
+
+
     @BindView(R.id.car_wash_text)
     TextView carWashText;
     @BindView(R.id.sport_text)
     TextView sportText;
     @BindView(R.id.bing_pic_img)
     ImageView bingPicImg;
-    @BindView(R.id.swipe_refresh)
+/*    @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefresh;
-    @BindView(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)*/
     DrawerLayout drawerLayout;
     @BindView(R.id.nav_button)
     Button navButton;
     private String mWeatherId; //城市id 例如：CN101010100
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
-        if (weatherString != null) {
+/*        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString = prefs.getString("weather", null);*/
+/*        if (weatherString != null) {
             //有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
-            mWeatherId = weather.basic.weatherid;
             showWeatherInfo(weather);
         } else {
             //无缓存时去服务器查询天气
-            mWeatherId= getIntent().getStringExtra("weather_id");
+            String weatherId= getIntent().getStringExtra("weather_id");
+            Log.d("Deer404","id"+weatherId);
+*//*            String cityname = getIntent().getStringExtra("city");
+            Log.d("Deer404",cityname);*//*
             weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(mWeatherId);
-        }
+            requestWeather(weatherId);
+        }*/
         //下拉刷新天气数据
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+/*        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestWeather(mWeatherId);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+                String weatherString = prefs.getString("weather", null);
+                Weather weather = Utility.handleWeatherResponse(weatherString);
+                String Reweather = weather.basic.weatherid;
+                requestWeather(Reweather);
             }
         });
-        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)*/;
         //背景图片
-        String bingPic = prefs.getString("bing_pic",null);
+/*        String bingPic = prefs.getString("bing_pic",null);
         if (bingPic!=null){
             Glide.with(this).load(bingPic).into(bingPicImg);
         }else {
             loadBingPic();
-        }
-        //状态栏透明
+        }*/
+/*        //状态栏透明
         if (Build.VERSION.SDK_INT >= 21){
             View decorView = getWindow().getDecorView();
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+        }*/
         //滑动菜单
-        navButton.setOnClickListener(new View.OnClickListener() {
+/*        navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
-        });
-
+        });*/
     }
 
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=eed82d5fd7d94b1a9ef312d7f971d8eb";
+        String weatherUrl = "https://free-api.heweather.net/s6/weather/forecast?location=" + weatherId + "&key=56f21f63422440da937ff9967f4b1e68";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
+                Log.d("Deer404Log",responseText);
                 final Weather weather = Utility.handleWeatherResponse(responseText);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (weather != null && "ok".equals(weather.status)) {
+                            Log.d("Deer404",weather.status);
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("weather", responseText);
                             editor.apply();
@@ -138,7 +147,7 @@ public class WeatherActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
-                        swipeRefresh.setRefreshing(false);
+                        /*swipeRefresh.setRefreshing(false);*/
                     }
                 });
             }
@@ -149,7 +158,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                        swipeRefresh.setRefreshing(false);
+                       /* swipeRefresh.setRefreshing(false);*/
                     }
                 });
             }
@@ -157,14 +166,14 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(Weather weather) {
-        String cityName = weather.basic.cityName;
-        String updateTime = weather.basic.update.updateTime.split(" ")[1];
-        String degree = weather.now.temperature + "℃";
-        String weatherInfo = weather.now.more.info;
-        titleCity.setText(cityName);
-        titleUpdateTime.setText(updateTime);
-        degreeText.setText(degree);
-        weatherInfoText.setText(weatherInfo);
+/*        String cityName = weather.basic.cityName;
+        String updateTime = weather.basic.update.updateTime.split(" ")[1];*/
+//        String degree = weather.now.temperature + "℃";
+//        String weatherInfo = weather.now.more.info;
+/*        titleCity.setText(cityName);
+        titleUpdateTime.setText(updateTime);*/
+/*        degreeText.setText(degree);
+        weatherInfoText.setText(weatherInfo);*/
         forecastLayout.removeAllViews();
         for (Forecast forecast : weather.forecastList) {
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
@@ -175,36 +184,43 @@ public class WeatherActivity extends AppCompatActivity {
             long diff = Time.converTime(forecast.date);
             if (diff >= 0){
                 if (diff == 0){
-                    Log.d("Deer404Time","Time"+diff);
                     dateText.setText("今天");
-                }
-                if (diff == 1){
+                }else if (diff == 1){
                     dateText.setText("明天");
-                }
-                if(diff ==2){
+                }else if(diff ==2){
                     dateText.setText("后天");
                 }
             }
-            infoText.setText(forecast.more.info);
-            maxText.setText(forecast.temperature.max);
-            minText.setText(forecast.temperature.min);
+            infoText.setText(forecast.cond);
+            maxText.setText(forecast.tmpmax);
+            minText.setText(forecast.tmpmin);
             forecastLayout.addView(view);
+/*            infoText.setText(forecast.more.info);
+            maxText.setText(forecast.temperature.max);
+            minText.setText(forecast.temperature.min);*/
+/*            forecastLayout.addView(view);*/
         }
-        if (weather.aqi != null) {
+/*        if (weather.aqi != null) {
             aqiText.setText(weather.aqi.city.aqi);
             pm25Text.setText(weather.aqi.city.pm25);
-            qltyText.setText(weather.aqi.city.qlty);
+            String qlty = weather.aqi.city.qlty;
+            if (qlty.length()>3){
+                qltyText.setTextSize(25);
+                qltyText.setText(qlty);
+            }else {
+                qltyText.setText(qlty);
+            }
 
-        }
-        String comfort = "舒适度" + weather.suggestion.comfort.info;
+        }*/
+/*        String comfort = "舒适度" + weather.suggestion.comfort.info;
         String carWash = "洗车指数" + weather.suggestion.carWash.info;
         String sport = "运动建议" + weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
-        sportText.setText(sport);
-        weatherLayout.setVisibility(View.VISIBLE);
+        sportText.setText(sport);*/
+        weatherLayout.setVisibility(View.VISIBLE);/*
         Intent intent = new Intent(this,AutoUpdateService.class);
-        startService(intent);
+        startService(intent);*/
     }
 
     private void loadBingPic() {

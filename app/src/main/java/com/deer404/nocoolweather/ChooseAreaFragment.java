@@ -2,12 +2,18 @@ package com.deer404.nocoolweather;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -68,6 +74,7 @@ public class ChooseAreaFragment extends Fragment {
         return view;
     }
 
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) { //当活动创建完成后
         super.onActivityCreated(savedInstanceState);
@@ -82,6 +89,7 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 }else if (currentLevel == LEVEL_COUNTY){
                     String weatherId = countyList.get(position).getWeatherId();
+                    Weather weather = new Weather();
                     if (getActivity() instanceof MainActivity){
                         Intent intent = new Intent(getActivity(),WeatherActivity.class);
                         intent.putExtra("weather_id",weatherId);
@@ -90,7 +98,7 @@ public class ChooseAreaFragment extends Fragment {
                     }else if (getActivity() instanceof WeatherActivity){
                         WeatherActivity activity = (WeatherActivity) getActivity();
                         activity.drawerLayout.closeDrawers();
-                        activity.swipeRefresh.setRefreshing(true);
+                       /* activity.swipeRefresh.setRefreshing(true);*/
                         activity.requestWeather(weatherId);
                     }
                 }
@@ -107,7 +115,9 @@ public class ChooseAreaFragment extends Fragment {
             }
         });
         queryProvinces(); //加载省级数据
+
     }
+
     /*
      * 查询全国所有的省，优先从数据库查询，如果没有查询到就从服务器上查询
      */

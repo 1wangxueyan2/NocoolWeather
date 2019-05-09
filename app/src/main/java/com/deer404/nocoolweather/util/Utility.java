@@ -9,6 +9,7 @@ import com.deer404.nocoolweather.WeatherActivity;
 import com.deer404.nocoolweather.db.City;
 import com.deer404.nocoolweather.db.County;
 import com.deer404.nocoolweather.db.Province;
+import com.deer404.nocoolweather.gson.FindLocation;
 import com.deer404.nocoolweather.gson.Weather;
 import com.google.gson.Gson;
 
@@ -94,9 +95,8 @@ public class Utility {
     public static Weather handleWeatherResponse(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
             String weatherContent = jsonArray.getJSONObject(0).toString();
-            Log.d("Deer404","JsonArray:"+weatherContent);
             return new Gson().fromJson(weatherContent, Weather.class);
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,4 +104,17 @@ public class Utility {
         return null;
     }
 
+
+    /*解析地址*/
+    public static FindLocation handleLocationResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, FindLocation.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
